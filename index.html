@@ -767,18 +767,15 @@ var hasAttr=function(a,b){return a.hasAttribute?a.hasAttribute(b):!!a.attributes
 
 <script>
 function jqFunc() {
-	alert("yep"); 
-
-	$.jsonp({
-		"url":"http://api.twitter.com/1/statuses/user_timeline/codinghorror.json"
-		,
-		"success":function(data) {
-			alert("SUCEESS!");
-		},
-		"error":function(d,msg) {
-			alert("SAD: " + msg + d);
-		}
+	var url = "http://feeds.delicious.com/v2/json/recent";
+	
+	remoteGet(url, null, function(data) {
+		alert("Woot!");
 	});
+}
+
+function remoteGet(url, null, success) {
+	$.getJSON(url + "?callback=?", null, success);
 }
 
 </script>
