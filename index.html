@@ -767,13 +767,13 @@ var hasAttr=function(a,b){return a.hasAttribute?a.hasAttribute(b):!!a.attributes
 
 <script>
 function jqFunc() {
-	alert("yep");
+	alert("yep"); 
 
 	$.jsonp({
-		"url":"http://www.google.com"
+		"url":"http://api.twitter.com/1/statuses/user_timeline/codinghorror.json"
 		,
 		"success":function(data) {
-			alert("SUCEESS: " + data);
+			alert("SUCEESS!");
 		},
 		"error":function(d,msg) {
 			alert("SAD: " + msg + d);
