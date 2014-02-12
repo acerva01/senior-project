@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+        Remove this if you use the .htaccess -->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link type="text/css" rel="stylesheet" media="all" href="../css/jquery.mobile-1.4.0.css" />
+        <link type="text/css" rel="stylesheet" media="all" href="../css/jquery.mmenu.all.css" />
+        <link type="text/css" rel="stylesheet" media="all" href="../css/custom.css" />
+
+        <script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="../js/jquery.mobile-1.4.0.js"></script>
+        <script type="text/javascript" src="../js/jquery.mmenu.min.all.js"></script>
+        <script type="text/javascript" src="../js/myscript.js"></script>
+
+        <!-- <script>
+        function hideAll() {
+            $("#prayerlist").children().each(function(){
+               this.style.display = "none";
+            });
+        }
+
+        $(function() {
+            var type = getPrayer();
+
+            console.log("Water"+type);
+
+            hideAll();
+
+            type = "#p"+type;
+
+            $(type).css("display", "inline");
+
+            // $("#my-menu").mmenu({
+                 // classes: "mm-light mm-slide",
+                 // zposition: "front",
+                 // onClick: {setSelected: true, preventDefaut: null, close: true, blockUI: true}
+              // });
+        });
+
+        </script> -->
+    </head>
+    <body>
+        <div id="prayerpage" data-role="page">
+
+            <a href="#prayermenu">Click</a>
+
+            <div>Hallo</div>
+
+            <div id="prayerlist">
+                <div id="p0" style="display: none">Thee Prayer</div>
+                <div id="p1" style="display: none">father</div>
+                <div id="p2" style="display: none">mary</div>
+                <div id="p3" style="display: none">glory</div>
+                <div id="p4" style="display: none">hal</div>
+            </div>
+
+            <nav id="prayermenu">
+               <ul>
+                  <li><a href="index.html">Home</a></li>
+                  <li>
+                    <a>Community</a>
+                    <ul>
+                        <li><a href="www/pages/community/houses.html"  >Community Houses</a></li>
+                        <li><a href="www/pages/community/mwgroups.html">Men's & Women's Groups</a></li>
+                        <li><a href="www/pages/community/retreats.html">Retreats</a></li>
+                        <li><a href="www/pages/community/events.html"  >Other Activities & Events</a></li>
+                    </ul>
+                  </li>
+                  <li><a href="www/pages/sacraments/">Sacraments & Ministries</a></li>
+                  <li><a href="www/pages/calendar/"  >Calendar</a></li>
+                  <li>
+                    <a href="">Prayers</a>
+                    <ul>
+                        <li><a href="www/pages/prayer.html" onclick="setPrayer(1)">One</a></li>
+                        <li><a href="www/pages/prayer.html" onclick="setPrayer(2)">Two</a></li>
+                        <li><a href="www/pages/prayer.html" onclick="setPrayer(3)">Three</a></li>
+                        <li><a href="www/pages/prayer.html" onclick="setPrayer(4)">Four</a></li>
+                    </ul>
+                  </li>
+                  <li><a href="www/pages/more/">More</a></li>
+              </ul>
+            </nav>
+
+            <footer>
+                <p>
+                    &copy; Copyright  by Alejandro
+                </p>
+            </footer>
+
+            <script>
+            function hideAll() {
+                $("#prayerlist").children().each(function(){
+                   this.style.display = "none";
+                });
+            }
+
+            function show() {
+                var selection = "#p"+getPrayer();
+
+                hideAll();
+
+                $(selection).css("display", "inline");
+            }
+
+            $( document ).on( "pageinit", "#prayerpage", function( event ) {
+                show();
+
+                console.log(prayerMenuInited);
+
+                if(!prayerMenuInited) {
+                    $("#prayermenu").mmenu({
+                     classes: "mm-light mm-slide",
+                     zposition: "front",
+                     onClick: {setSelected: true, preventDefaut: null, close: true, blockUI: null}
+                    });
+
+                    prayerMenuInited = true;
+                }
+            });
+            </script>
+        </div>
+    </body>
+</html>
