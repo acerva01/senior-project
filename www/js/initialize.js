@@ -84,7 +84,7 @@ $(function(){
 	});
 	
 	$("#page").on("swiperight", function(){$("#externalpanel").panel("open"); return false;});
-	$.event.special.swipe.verticalDistanceThreshold = 15;
+	//$.event.special.swipe.verticalDistanceThreshold = 15;
 	
 	
 	

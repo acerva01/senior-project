@@ -9,7 +9,7 @@
         <title>New Web Project</title>
 
         <link type="text/css" rel="stylesheet" media="all" href="www/css/jquery.mobile-1.4.0.css" />
-        <link type="text/css" rel="stylesheet" media="all" href="www/css/jquery.mmenu.all.css" />
+        <link type="text/css" rel="stylesheet" media="all" href="www/css/jquery-mobile-fluid960.min.css" />
 		<link type="text/css" rel="stylesheet" media="all" href="www/css/jqm-datebox-1.4.0.min.css" />
 		<link type="text/css" rel="stylesheet" media="all" href="www/css/custom.css" />
 
@@ -296,7 +296,7 @@
 				<%= desc.replace(new RegExp('\r?\n', 'g'), '<br />') %>
 				<br>
 				<button data-role="button" data-mini="true" class="subscribe" style="width:100px" <%= subed ? 'disabled="true"' : 'enabled="true"' %> >
-					<%= subed ? 'Subscribed &check;' : 'Subscribe' %>
+					<%= subed ? 'Subscribed &checkmark;' : 'Subscribe' %>
 				</button>
 			</div>
 	    </script>
@@ -322,23 +322,40 @@
 	    --------------------------------------------------------------------------------------------------->
 	    
 	    <script type="text/template" id="user-profile-settings">
-	    	<div data-role="fieldcontain">
+	    	<!-- <div data-role="fieldcontain">
 		    	<label for="name-input">Username: </label>
 		    	<input id="name-input" type="text"  name="" placeholder="" value="<%= username %>" data-mini="true" readonly="true">
-	    	</div>
+	    	</div> -->
 	    	
-	        <h4>Change Password</h4>
-	        <div data-role="fieldcontain">
+	    	<p><b>Username: </b> <%= username %></p>
+	    	
+	        <p><b>Change Password:</b></p>
+	        
+	        <div class="container_12">
+	        	<div class="grid_5" style="margin-top: 10px">New Password:</div>
+	        	<div class="grid_7"><input id="pass-input" type="text" data-mini="true"></div>
+	        </div>
+	        <div class="container_12">
+	        	<div class="grid_5" style="margin-top: 10px">Repeat Password:</div>
+	        	<div class="grid_7"><input id="pass-input" type="text" data-mini="true"></div>
+	        </div>
+	        
+	        <div class="container_12">
+	        	<div class="grid_5">&nbsp;</div>
+	        	<div class="grid_7"><input id="pass-change" type="button" name="Submit" value="Submit"/></div>
+	        </div>
+	        
+	        <!-- <div data-role="fieldcontain">
 	      		<label for="pass-input">New Password:</label>
-    	  	 	<input id="pass-input" type="text"  name="" placeholder="" value="" data-mini="true">
+    	  	 	<input id="pass-input" type="text" data-mini="true">
     	    </div>
     	  
     	    <div data-role="fieldcontain">
 	      		<label for="repeat-input">Repeat Password:</label>
     	  		<input id="repeat-input" type="text"  name="" placeholder="" value="" data-mini="true">
-    	  	</div>
+    	  	</div> -->
     	  
-		  	<input id="pass-change" type="button" name="Submit" value="Submit"/>
+		  	<!-- <input id="pass-change" type="button" name="Submit" value="Submit"/> -->
 	    </script>
 	    
 	    
