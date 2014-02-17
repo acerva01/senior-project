@@ -1,186 +1,34 @@
 /**
  * @author Alejandro
  */
-var chosenPrayer = 0;
-var menuInited = false;
-var prayerMenuInited = false;
-var houseMenuInited = false;
 
-var currentView = null;
-
-var viewStack = new Array();
-
-
-
-console.log("Hallo!");
-
-function setPrayer(type) {
-    chosenPrayer = type;
-    console.log("Prayer set! " + type);
-}
-
-function getPrayer() {
-    console.log("Prayer got! " + chosenPrayer);
-    return chosenPrayer;
-}
 
 $(function(){
-
-	Parse.$ = jQuery;
 	
-	Parse.initialize("hnnS9Xh0mXWnb9UGmVpaeT2VXC9aEbtWPE74oIph", "t3Y2KNpEDlk1wg9t6PxAo0ZdWbAvDCC9sX2AkNIX");
-	
-	FastClick.attach(document.body);
-	
-	function destroyView(view) {
-	    //COMPLETELY UNBIND THE VIEW
-	    view.undelegateEvents();
-	
-	    view.$el.removeData().unbind(); 
-	
-	    //Remove view from DOM
-	    view.remove();  
-	    Parse.View.prototype.remove.call(view);
-	
-    }
-    
-    function replaceView(newView) {
-    	destroyView(viewStack.pop());
-		viewStack.push(newView);
-    }
-	
-	function openAddEvent() {
-		$("#externalpanel").panel("close");
-		//replaceView(new AddEventView);
-		new AddEventView;
-	};
-	
-	function openViewEvents() {
-		$("#externalpanel").panel("close");
-		// replaceView(new TwoWeekView);
-		new TwoWeekView;
-	};
-
-	
-	$("#menu-add-event").click(function(){openAddEvent(); return false;});
-	$("#menu-view-events").click(function(){openViewEvents(); return false;});
-	
-	var Event = Parse.Object.extend("Event", {
-		defaults: {
-			name:   "Default",
-			desc:   "Default",
-			start:  new Date(),
-			end:    new Date(),
-			invite: false,
-			recur:  false,
-			repeat: {'Su':false, 
-					 'Mo':false, 
-					 'Tu':false, 
-					 'We':false, 
-					 'Th':false, 
-					 'Fr':false, 
-					 'Sa':false
-					},
-			each:	0,
-			user:   Parse.User.current(),
-    		ACL:    new Parse.ACL(Parse.User.current())
-		},
-
-	    initialize: function() {
-	      // if (!this.get("content")) {
-	        // this.set({"content": this.defaults.content});
-	      // }
-	    }
-	});
-	
-	
-	var EventView = Parse.View.extend({		
-		el: "<div class='event-item'>",
-		
-		template: _.template($("#event-item-template").html()),
-		
-		render: function() {
-		  console.log(this.model.get('start').getTime());
-		  
-		  var startObj = this.model.get('start');
-		  var startDate = startObj.toLocaleDateString();
-		  var startTime = startObj.toLocaleTimeString();
-		  var start = startDate.slice(0, startDate.lastIndexOf(",")) + " at ";
-		  start 	= start + startTime.slice(0, startTime.lastIndexOf(":")) + startTime.slice(startTime.lastIndexOf(" "), startTime.length);
-		  
-		  var endObj = this.model.get('end');
-		  var endDate = endObj.toLocaleDateString();
-		  var endTime = endObj.toLocaleTimeString();
-		  var end	= endDate.slice(0, endDate.lastIndexOf(",")) + " at ";
-		  end 		= end + endTime.slice(0, endTime.lastIndexOf(":")) + endTime.slice(endTime.lastIndexOf(" "), endTime.length);
-		  
-		  var name = this.model.get('name');
-		  var desc = this.model.get('desc');
-		  
-	      $(this.el).html(this.template({
-	      	name: name,
-	      	desc: desc,
-	      	start: start,
-	      	end: end
-	      }));
-	      return this;
-	    }
-    
-	});
-	
-	var EventList = Parse.Collection.extend({
-		// Reference to this collection's model.
-	    model: Event
-	
-	    
-	    // comparator: function(eventModel) {
-	      // return (this.model.get('start').getTime() <= eventModel.get('start').getTime()) ? -1 : 1;
-	    // }
-	});
-	
-	var TwoWeekView = Parse.View.extend({
-		
-		el: ".content",
-		
-		initialize: function() {
-		  	var self = this;
-		  	
-		  	this.$el.html("<h3>Events</h3><br>");
-			
-			var query = new Parse.Query(Event);
-			query.find({
-			  	success: function(results) {
-			  		self.displayEvents(self, results);
-			  	},
-			  	error: function(error) {
-			    	console.error("Error retrieving events: " + error.code + " " + error.message);
-			  	}
-		  	});
-		},
-		
-		displayEvents: function (self, results) {
-			for (var i = 0; i < results.length; i++) {
-		      var event = results[i];
-		      
-		      var view = new EventView({model: event});
-			  self.$el.append(view.render().el);
-		    }
-		    
-		    self.$el.trigger('create');
-		},
-		
-		render: function() {
-			return this;
-		}
-	});
+	// FIXME: Take out for deployment!
+	Parse.User.logOut();
 	
 	/*
+		FIXME: BUGS
+				- Add Event view overwrites first added event after adding event, navigating around, then adding a new event
 	
-		FIXME: 	User settings page
+		FIXME: 	Offline solution - After thought
+					- Eventual support/notice of older version, e.g "Warning: You're device is using an older version of browser X. Some features may not work."
+				Header displays name of current page 
+				One submenu open at a time in navigation
+				Events
+					- Better event views/navigation
+					- View a single event?
+					- View an event by navigating a calendar
+						- Click on day of calendar to open something (dialog?) which lists all events for that day with a "View" button for each event
+					- Add un-subscribe button to event view
+				User settings page
 					- Have a footer to navigate?
 					- Push notifications
+						- Push new events to phone. Setting to receive notifications about new events						
 					- Edit subscriptions/events
 						- Unsubscribe from just one instance?
+					- Maintain local and remote copy of a settings object. Remote obj functions as a backup. Only query remote if changes made locally.
 				Proper Navigation between "pages"
 				Theme-ing
 				Push Notifications
@@ -188,7 +36,29 @@ $(function(){
 					- On subcribe, disable button and say "Subscribed!"
 					- Allow opening of only 1 event at a time. Auto-close others.
 					- Indicate success/failure of event submit
-	
+					- Indicate failure better for invalid login.
+					- Better login screen for first app use
+					- ADD VALIDATION FOR ADD EVENT
+						- In two week view, disable "Subscribe" for already subscribed events
+										
+				Favorites? Favorite pages? Quick menu to favorites?
+				Create Parse.com "Roles" for things like...
+					- Music Ministry leaders
+					- Men's group leaders
+					- Women's group...
+					- others
+				Need to sweep anonymous users?
+				Definitely sweep old events
+					
+				CONSIDER: Now, for instance, Music Ministry has MORE places to UPDATE DATA.
+				
+				For anonymous users and signing up:
+					- Create a scheduled job to update a value in a Parse class daily. This is the sign up key.
+					- Only users who are registered can view/access this key
+					- Users who want to register (so that they can post) must acquire this key from another registered user (ideally in person, e.g. word of mouth)
+						- Then they can upgrade their anonymous account 
+						- The "button" to upgrade will be in the anon's account settings
+							
 	
 		FIXME: For invite only, make sure a user's calendar doesn't include
 		events they were not invited to.
@@ -198,6 +68,7 @@ $(function(){
 		Peoples Kitchen generator
 		Vesper's Adoration generator
 		Bible Study generator
+		Sunday mass generator
 		
 		
 		FIXME: User Settings - Event notification (15min advanced warning? 30min? They choose)
@@ -206,143 +77,6 @@ $(function(){
 				- Add another button "Subscribe to All" or "Subscribe once"
 	
 	*/
-	
-	var UserProfileView = Parse.View.extend({
-		el: ".content",
-		
-		initialize: function() {
-			var self = this;
-		  	
-		  	this.$el.html("<h3>Events</h3><br>");
-			
-			var query = new Parse.Query(Event);
-			query.find({
-			  	success: function(results) {
-			  		self.displayEvents(self, results);
-			  	},
-			  	error: function(error) {
-			    	console.error("Error retrieving events: " + error.code + " " + error.message);
-			  	}
-		  	});
-		},
-		
-		render: function() {
-			return this;
-		}
-	});
-	
-	var UserSubscriptionView = Parse.View.extend({
-		el: ".content",
-		
-		initialize: function() {
-			var self = this;
-		  	
-		  	this.$el.html("<h3>Events</h3><br>");
-			
-			var query = new Parse.Query(Subscription);
-			query.find({
-			  	success: function(results) {
-			  		self.displayEvents(self, results);
-			  	},
-			  	error: function(error) {
-			    	console.error("Error retrieving events: " + error.code + " " + error.message);
-			  	}
-		  	});
-		},
-		
-		render: function() {
-			return this;	
-		}
-	});
-	
-	
-	
-	var AddEventView = Parse.View.extend({
-		events: {
-			"click input.add-event": "saveEvent",
-			"change #event-recur": "toggleRecur"
-		},
-		
-		el: ".content",
-		
-		initialize: function() {
-			_.bindAll(this, "saveEvent");
-	        this.$el.html(_.template($("#add-event-template").html()));
-	        
-	        this.eventName  = this.$('#event-name');
-	        this.eventDesc  = this.$('#event-desc');
-	        this.invite		= this.$('#event-anyone');
-	        this.recur		= this.$('#event-recur');
-	        this.start		= this.$('#event-start');
-	        this.startTime	= this.$('#start-time');
-	        this.endTime	= this.$('#endTime');
-	        //this.visible	= this.$('#event-recurrence').css("display");
-	        // $("#event-invitation :radio:checked").val();
-	        // $("#event-recurring  :checkbox:checked").val();
-	        // var eventName = this.$('#event-name');
-	        // var eventName = this.$('#event-name');
-	        // var eventName = this.$('#event-name');
-	        this.$('#event-recurrence').css("display", "none");	        
-			this.render();
-		},
-		
-		toggleRecur: function(e) {
-			console.log(this.$('#event-recurrence').css("display"));
-			if(this.$('#event-recurrence').css("display") == "none") {
-				this.$('#event-recurrence').css("display", "block");
-			}
-			else {
-				this.$("#event-recurrence").css("display", "none");
-			}
-		},
-		
-		saveEvent: function(e) {
-			// console.log($("#event-invitation :radio:checked").val());
-			// console.log($("#event-recurring  :checkbox:checked").val());
-			this.model.save({
-				name: 	this.eventName.val(),
-				desc: 	this.eventDesc.val(),
-				invite: (this.invite.val() ? true : false),
-				recur:	(this.recur.val()  ? true : false),
-				start:	this.createDate(this.start.val(), this.startTime.val())
-			});
-		},
-		//
-		//
-		// 		FIXME: REMEMBER TO FIX UTC TIME ISSUES
-		//
-		//
-		createDate: function(startDate, timeString) {
-			console.log(startDate);
-			console.log(timeString);
-			
-			var newDate = new Date(Date.parse(startDate));
-		    newDate.setHours(0);
-		    newDate.setMinutes(0);
-		    newDate.setSeconds(0);
-		    newDate.setMilliseconds(0);
-		    
-		    var hours = timeString.slice(0,2);
-		    var minutes = timeString.slice(3,5);
-		    
-		    if(hours.charAt(0 == '0')) {
-		    	hours = hours.slice(1,1);
-		    }
-		    
-		    newDate.setHours(hours);
-		    newDate.setMinutes(minutes);
-		    
-		    console.log(newDate);
-		    
-		    return newDate;
-		},
-	
-	    render: function() {
-	   	  	this.$el.trigger('create');
-	      	this.delegateEvents();
-		  	return this;
-	    }
-	});
 	
 	var LoginView = Parse.View.extend({
 	    events: {
@@ -367,9 +101,9 @@ $(function(){
 	      
 	      Parse.User.logIn(username, password, {
 	        success: function(user) {
-	      	  currentView = new AddEventView({model: (new Event())});
-	          self.undelegateEvents();
-	          delete self;
+	      	  replaceView(new AddEventView({model: (new Event({username: Parse.User.current().get("username")}))}));
+	          //self.undelegateEvents();
+	          //delete self;
 	        },
 	
 	        error: function(user, error) {
@@ -390,9 +124,9 @@ $(function(){
 	      
 	      Parse.User.signUp(username, password, { ACL: new Parse.ACL() }, {
 	        success: function(user) {
-	          new AddEventView({model: (new Event())});
-	          self.undelegateEvents();
-	          delete self;
+	      	  replaceView(new AddEventView({model: (new Event({username: Parse.User.current().get("username")}))}));
+	          //self.undelegateEvents();
+	          //delete self;
 	        },
 	
 	        error: function(user, error) {
@@ -413,7 +147,13 @@ $(function(){
 	  });
 	  
 	
-	viewStack.push(new LoginView);
-	//new AddEventView;
+	if(Parse.User.current()) {
+		replaceView(new AddEventView);
+		//viewStack.push(new AddEventView);
+	}
+	else {
+		replaceView(new LoginView);
+		//viewStack.push(new LoginView);
+	}
 	//new TwoWeekView;
 });
