@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="initial-scale=1.0">
+        <meta name="viewport" content="initial-scale=1.0, target-densitydpi=device-mdpi">
 <!-- width=device-width, -->
         <title>New Web Project</title>
 
@@ -21,9 +21,13 @@
    		<script type="text/javascript" src="www/js/libraries/underscore-1.5.2.js"></script>
         <script type="text/javascript" src="www/js/libraries/parse-1.2.16.js"></script>
         <script type="text/javascript" src="www/js/libraries/fastclick.js"></script>
+        <script type="text/javascript" src="www/js/libraries/moment.min.js"></script>
+        <script type="text/javascript" src="www/js/libraries/sha512.js"></script>
+        
         <script type="text/javascript" src="www/js/initialize.js"></script>
         <script type="text/javascript" src="www/js/events.js"></script>
         <script type="text/javascript" src="www/js/user-settings.js"></script>
+        <script type="text/javascript" src="www/js/calendar-view.js"></script>
         <script type="text/javascript" src="www/js/myscript.js"></script>
 		<!-- <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 		<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
@@ -50,6 +54,23 @@
 			    $("#externalpanel").trigger("create");
 			});
 		</script> -->
+		<script>
+		    function testDate() {
+		    	var dater = moment("2014-02-14", "YYYY-MM-DD");
+		    	alert(dater.toDate());
+		    }
+		    
+		</script>
+		
+		<script type="text/javascript" charset="utf-8">
+	    document.addEventListener("deviceready", onDeviceReady, false);
+	
+	    function onDeviceReady() {
+	    	alert("DEVICE READY");
+	    }
+	
+	    </script>
+
 		
     </head>
 
@@ -64,11 +85,43 @@
 		    </div>
 		    
 		    
-		    
     		<div class="content">
     		</div>
     		
+    		<!-- 
+    			
+    			<div data-role="page" id="page1">
+					<div data-role="header">
+						<h1>jQuery Mobile Example</h1>
+					</div>
+					<div role="main" class="ui-content">
+						<a href="#dialogPage" data-rel="dialog">Open dialog</a>
+					</div>
+					<div data-role="footer">
+						<h2></h2>
+					</div>
+				</div>
+				
+				<div data-role="page" id="dialogPage">
+					<div data-role="header">
+						<h2>Dialog</h2>
+					</div>
+					<div role="main" class="ui-content">
+						<p>I am a dialog</p>
+					</div>
+				</div>
+    			
+    			
+    		-->
     		
+    		
+		        <div style="display: none">
+					<input name="event-start" id="display-calendar" type="date" data-role="datebox"
+						data-options='{"mode": "calbox", "dialogForce": true}'>
+			   </div>
+			   
+			   <!-- <input name="mydate" id="mydate" type="date" data-role="datebox"
+   					data-options='{"mode":"calbox", "useSetButton":false, "useInline": true}'> -->
     		
     		<div class="ui-state-persist" id="settings-footer" data-theme="" data-role="footer" data-position="fixed" data-tap-toggle="false" data-hide-during-focus="false" style="display:none">
     			<div data-role="navbar">
@@ -95,6 +148,7 @@
 	                <li data-icon="false"><a id="menu-add-event"   		href="#">Add Event</a></li>
 	                <li data-icon="false"><a id="menu-view-events" 		href="#">View Events</a></li>
 	                <li data-icon="false"><a id="menu-account-settings" href="#">Settings</a></li>
+	                <li data-icon="false"><a id="event-calendar" 		href="#">Calendar</a></li>
 	                <li data-role="collapsible" data-iconpos="right" data-inset="false" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" style="padding: 0; border: 0;">
 	                    <h2 style="margin: 0;">Submenu 3</h2>
 	                    <ul data-role="listview" class="red">
@@ -117,6 +171,23 @@
 	        </div>
     		
     	</div>
+    	
+    	<div data-role="page" id="calendarPage">
+			<div data-role="header">
+				<h2>Dialog</h2>
+			</div>
+			<div role="main" class="ui-content">
+			</div>
+		</div>
+		
+		<script type="text/template" id="calendar-template">
+			<input name="main-calendar" id="main-calendar" type="date" data-role="datebox"
+				data-options='{"mode":"calbox", "useSetButton":false, "useInline": true, "highDates": [<%= highDates %>]}'>
+			
+			<br>
+			
+			<div id="calendar-view" data-role="collapsible-set"></div>
+	    </script>
     	
     	
     	<!--------------------------------------------------------------------------------------------------
@@ -289,12 +360,13 @@
 	    <script type="text/template" id="event-item-template">
 			<h3 id="<%= name + '-header' %>"><%= name + " - " + startDate %></h3>
 			<div id="<%= name + '-content' %>">
-				<p><b>Starts:</b> <%= start %></p>
-				<p><b>Ends:</b> <%= end %></p>
-				<p><b>Started by:</b> <%= username %></p>
-				<p style="display:<%= (recur) ? 'block' : 'none' %>"><b>Recurs:</b> Every <%= (each == 0) ? 'week' : 'month' %> on <%= recurring %> </p>
-				<%= desc.replace(new RegExp('\r?\n', 'g'), '<br />') %>
-				<br>
+				<b>Starts:</b> <%= start %><br />
+				<b>Ends:</b> <%= end %><br />
+				<div style="display:<%= (recur) ? 'block' : 'none' %>"><b>Recurs:</b> Every <%= (each == 0) ? 'week' : 'month' %> on <%= recurring %> </div>
+				<b>Started by:</b> <%= username %><br /><br />
+				
+				<%= desc.replace(new RegExp('\r?\n', 'g'), '<br />') %><br />
+				
 				<button data-role="button" data-mini="true" class="subscribe" style="width:100px" <%= subed ? 'disabled="true"' : 'enabled="true"' %> >
 					<%= subed ? 'Subscribed!' : 'Subscribe' %>
 				</button>
@@ -327,7 +399,12 @@
 		    	<input id="name-input" type="text"  name="" placeholder="" value="<%= username %>" data-mini="true" readonly="true">
 	    	</div> -->
 	    	
-	    	<p><b>Username: </b> <%= username %></p>
+	    	<div class="container_12">
+	        	<div class="grid_5"><b>Username: </b></div>
+	        	<div class="grid_7"><%= username %></div>
+	        </div>
+	    	
+	    	<!-- <p><b>Username: </b> <%= username %></p> -->
 	    	
 	        <p><b>Change Password:</b></p>
 	        
@@ -379,6 +456,34 @@
 		    	<div class="ui-block-b"><button id="save-changes" type="button">Save Changes</button></div>
 	    	</div>
 	    </script>
+	    
+	    <!--------------------------------------------------------------------------------------------------
+	    --	
+	    --
+	    --
+	    --			CALENDAR VIEWS
+	    --
+	    --
+	    --	
+	    --------------------------------------------------------------------------------------------------->
+    	
+    	<script type="text/template" id="calendar-event-template">
+      		<div class="grid_5"><b style="text-align:center; font-size: 12px"><%= name %></b></div>
+			<div class="grid_3"><input data-mini="true" class="edit" type="button" value="View" /></div>
+			<div class="grid_4"><input data-mini="true" class="edit" type="button" value="Subscribe" /></div>
+	    </script>
+	    
+	    <script type="text/template" id="calendar-view-template">
+					<!-- <a href="#dialogPage" data-rel="dialog">Open dialog</a> -->
+			<div data-role="page" id="calendarPage">
+				<div data-role="header">
+					<h2>Dialog</h2>
+				</div>
+				<div role="main" class="ui-content">
+				</div>
+			</div>
+		</script>
+    	
     	
     	
         <!-- <h1>New Web Project Page</h1>

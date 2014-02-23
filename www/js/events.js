@@ -11,7 +11,15 @@ $(function(){
 		defaults: {
 			owner: Parse.User.current(),
     		ACL:    new Parse.ACL(Parse.User.current())
-		}
+		},
+
+	    initialize: function() {
+	    	var self = this;
+	    	var usr = Parse.User.current();
+    		var ACL = new Parse.ACL(usr);
+	    	
+	    	self.set({"ACL": ACL, "owner": usr});
+	    }
 	});
 	
 	Event = Parse.Object.extend("Event", {
@@ -40,7 +48,7 @@ $(function(){
     		
     		ACL.setPublicReadAccess(true);
 	    	
-	    	self.set({"ACL": ACL});
+	    	self.set({"ACL": ACL, "user": usr});
 	    }
 	});	
 	
@@ -157,7 +165,7 @@ $(function(){
 			"click button.subscribe" : "subscribe"
 		},
 			
-		el: "<div class='event-item-collapse' data-role='collapsible' data-iconpos='right' data-mini='true'>",
+		el: "<div class='event-item-collapse' data-role='collapsible' data-iconpos='right'>",
 		
 		template: _.template($("#event-item-template").html()),
 		
@@ -179,15 +187,15 @@ $(function(){
 			// FIXME: Subscribed! After subscribe
 			var sub = new Sub({
 				event: self.model,
-				recurring: self.model.get("recur")
+				recurring: self.model.get("recur") // FIXME: This is not correct! 
 			});
 			sub.save();
 		},
 		
 		render: function() {
 		    var self = this;
-		    console.log(this.model.get('start').getTime());
-		  	console.log(self.subed);
+		    //console.log(this.model.get('start').getTime());
+		  	//console.log(self.subed);
 		  
 		    var startObj = this.model.get('start');
 		    var startDate = startObj.toLocaleDateString();
@@ -211,7 +219,7 @@ $(function(){
 		    var username = this.model.get('username');
 		    var subed = self.subed;
 		    
-		    console.log(repeat);
+		    //console.log(repeat);
 		    
 		    recurring = (repeat["Sun"] ? "Sun, " : "") +
 		    			(repeat["Mon"] ? "Mon, " : "") +
@@ -221,7 +229,7 @@ $(function(){
 		    			(repeat["Fri"] ? "Fri, " : "") +
 		    			(repeat["Sat"] ? "Sat, " : "");
 		    			
-		    console.log(recurring);
+		    //console.log(recurring);
 		    			
 		    recurring = recurring.slice(0, recurring.length-2);
 		  

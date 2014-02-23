@@ -9,19 +9,53 @@ $(function(){
 	Parse.User.logOut();
 	
 	/*
+		FIXME: Things to accomplish for end of Senior Project:
+				- User settings completed
+				- Push Notifications
+				- Calendar view of events
+					- Recurring events;
+				- Margins so everything isn't crammed to edge of screen
+				- Basic themes? Something different than all white...
+				- Background for slide-out menu
+				- Profile pictures? ;/
+				- Navigation history? Back button?
+				- Basic anonymous users and registered roles
+				- Sign up code generation
+				- Add User feedback elements
+					- Loading gifs
+					- Notification: "Subscribe success!";
+						- Cool, colored ellipsis "..." DISCO
+				
+				ORDER:
+				- Subscriptions
+				- Calendar view and associated elements
+				- Anon users and codes
+				- Push notices
+				- User settings
+				- Feedback elements
+				- Girly things (themes)
+				
+		FIXME: LAST TIME:
+				- Overriding set calendar event to allow me to popup a dialog with all events that day
+				- Each event listing will have a view and subscribe button. Like a mashup of TwoWeekView and Subscription settings
+		
 		FIXME: BUGS
 				- Add Event view overwrites first added event after adding event, navigating around, then adding a new event
+				- Time (e.g 12:34 pm) Not displaying correctly on Android event view
 	
 		FIXME: 	Offline solution - After thought
 					- Eventual support/notice of older version, e.g "Warning: You're device is using an older version of browser X. Some features may not work."
 				Header displays name of current page 
 				One submenu open at a time in navigation
+				
 				Events
 					- Better event views/navigation
 					- View a single event?
 					- View an event by navigating a calendar
 						- Click on day of calendar to open something (dialog?) which lists all events for that day with a "View" button for each event
 					- Add un-subscribe button to event view
+					- Only allow certain users to see certain events? Duh, invite only.
+					
 				User settings page
 					- Have a footer to navigate?
 					- Push notifications
@@ -29,6 +63,10 @@ $(function(){
 					- Edit subscriptions/events
 						- Unsubscribe from just one instance?
 					- Maintain local and remote copy of a settings object. Remote obj functions as a backup. Only query remote if changes made locally.
+					- Option to require login on app start
+					- User-chosen homepage?
+					- HOW ABOUT: No home button, but rather, move menu to right, then back button is on left
+					
 				Proper Navigation between "pages"
 				Theme-ing
 				Push Notifications
@@ -49,6 +87,7 @@ $(function(){
 					- others
 				Need to sweep anonymous users?
 				Definitely sweep old events
+					- AND old subscriptions!
 					
 				CONSIDER: Now, for instance, Music Ministry has MORE places to UPDATE DATA.
 				
@@ -72,9 +111,13 @@ $(function(){
 		
 		
 		FIXME: User Settings - Event notification (15min advanced warning? 30min? They choose)
+				- Day before for now..
 		
 		FIXME: 	- Add "This event recurs every...."
 				- Add another button "Subscribe to All" or "Subscribe once"
+				
+		FIXME: Passwordless authentication
+				- Hash device uuid and use as password for login.
 	
 	*/
 	
