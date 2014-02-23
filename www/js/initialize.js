@@ -105,9 +105,6 @@ function appendHighDate(baseStr, newDate, last) {
 
 
 $(function(){
-	
-	alert("JQUERY READY");
-	alert("" + device.uuid);
 
 	Parse.$ = jQuery;
 	

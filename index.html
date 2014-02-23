@@ -65,7 +65,7 @@
 		<script>
 		    function onDeviceReady() {
 		    	alert("DEVICE READY");
-				alert("" + device.uuid);
+				alert("DEVICE UUID: " + device.uuid);
 		    }
 		    
 			$(document).ready(function() {
@@ -75,6 +75,8 @@
 			        && document.URL.indexOf("https://") === -1) {
 			        window.isphone = true;
 			    }
+			    
+			    //console.info(window.isphone);
 			
 			    if( window.isphone ) {
 			        document.addEventListener("deviceready", onDeviceReady, false);
