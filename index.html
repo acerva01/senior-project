@@ -62,13 +62,15 @@
 		    
 		</script>
 		
-		<script type="text/javascript" charset="utf-8">
-	    document.addEventListener("deviceready", onDeviceReady, false);
-	
-	    function onDeviceReady() {
-	    	alert("DEVICE READY");
-	    }
-	
+		<script>
+		    function onDeviceReady() {
+		    	alert("DEVICE READY");
+		    }
+		    
+			$(function(){
+				document.addEventListener("deviceready", onDeviceReady, false);
+			});
+		    
 	    </script>
 
 		
