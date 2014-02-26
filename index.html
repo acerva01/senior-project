@@ -60,12 +60,23 @@
 		    	alert(dater.toDate());
 		    }
 		    
+		    function registerCode(){
+		    	// Parse.Cloud.run("generateRegisterCode", {}, {
+		    		// success: function(){
+		    			// console.log("REGISTER IS A GO");
+		    		// },
+		    		// error: function(){
+		    			// console.log("Registered failed with many tears.. ;(");
+		    		// }
+		    	// });
+		    }
+		    
 		</script>
 		
 		<script>
 		    function onDeviceReady() {
-		    	alert("DEVICE READY");
-				alert("DEVICE UUID: " + device.uuid);
+		    	// alert("DEVICE READY " + Math.random());
+				// alert("DEVICE UUID: " + device.uuid);
 		    }
 		    
 			$(document).ready(function() {
@@ -93,10 +104,9 @@
     <body>
     	<div id="page" data-role="page">
     		<div class="ui-state-persist" id="main-header" data-theme="" data-role="header" data-position="fixed" data-tap-toggle="false" data-hide-during-focus="false">
-		        <h3>Newman!</h3>
-		        <a data-controltype="panelbutton" data-role="button" data-inline="false" href="#externalpanel" data-icon="bars" data-iconpos="notext">
-		        </a>
-		        <a data-role="button" href="#" data-icon="home" data-iconpos="notext"class="ui-btn-right" onclick="changeView(new TwoWeekView); return false;">
+		        <h3 id="header-title">Newman!</h3>
+		        <a id="back-button" data-role="button" href="#" data-icon="back" onclick="goBack(); return false;">Back</a>
+		        <a class="ui-btn-right" data-controltype="panelbutton" data-role="button" data-inline="false" href="#externalpanel" data-icon="bars" data-iconpos="notext">
 		        </a>
 		    </div>
 		    
@@ -129,6 +139,7 @@
     			
     			
     		-->
+    		    <!-- <input type="button" value="Click me!" onclick="alert(typeof false);" /> -->
     		
     		
 		        <div style="display: none">
@@ -142,9 +153,9 @@
     		<div class="ui-state-persist" id="settings-footer" data-theme="" data-role="footer" data-position="fixed" data-tap-toggle="false" data-hide-during-focus="false" style="display:none">
     			<div data-role="navbar">
     				<ul>
-    					<li><a id="profile-settings"  href="#" onclick="replaceView(new UserProfileView)">Profile</a></li>
+    					<li><a id="profile-settings"  href="#" onclick="replaceView('UserProfileView');appHistory.pop();">Profile</a></li>
     					<li><a id="settings-settings" href="#" >Settings</a></li>
-    					<li><a id="subs-settings"     href="#" onclick="replaceView(new UserSubscriptionView)">Subscriptions</a></li>
+    					<li><a id="subs-settings"     href="#" onclick="replaceView('UserSubscriptionView');appHistory.pop();">Subscriptions</a></li>
     				</ul>
     			</div>
 		    </div>
@@ -163,14 +174,14 @@
 	            <ul data-role="listview" style="padding-right: 8px">
 	                <li data-icon="false"><a id="menu-add-event"   		href="#">Add Event</a></li>
 	                <li data-icon="false"><a id="menu-view-events" 		href="#">View Events</a></li>
-	                <li data-icon="false"><a id="menu-account-settings" href="#">Settings</a></li>
+	                <!-- <li data-icon="false"><a id="menu-account-settings" href="#">Settings</a></li> -->
 	                <li data-icon="false"><a id="event-calendar" 		href="#">Calendar</a></li>
 	                <li data-role="collapsible" data-iconpos="right" data-inset="false" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" style="padding: 0; border: 0;">
-	                    <h2 style="margin: 0;">Submenu 3</h2>
+	                    <h2 style="margin: 0;">Settings</h2>
 	                    <ul data-role="listview" class="red">
-	                        <li data-icon="false"><a href="#">Item 1</a></li>
-	                        <li data-icon="false"><a href="#">Item 2</a></li>
-	                        <li data-icon="false"><a href="#">Item 3</a></li>
+	                        <li data-icon="false"><a id="menu-account-profile" 	href="#">Profile</a></li>
+	                        <li data-icon="false"><a id="menu-account-settings" href="#">General Settings</a></li>
+	                        <li data-icon="false"><a id="menu-account-subs" 	href="#">Subscriptions</a></li>
 	                    </ul>
 	                </li>
 	                <li data-icon="false"><a href="#" style="border: 0">Submenu 4</a></li>
@@ -197,7 +208,8 @@
 		</div>
 		
 		<script type="text/template" id="calendar-template">
-			<input name="main-calendar" id="main-calendar" type="date" data-role="datebox"
+			<b style="font-size: 18px; text-align: center; width:100%; text-indent: 10px" >Select a date to view events</b>
+			<input name="main-calendar" id="main-calendar" type="date" data-role="datebox" readonly="true"
 				data-options='{"mode":"calbox", "useSetButton":false, "useInline": true, "highDates": [<%= highDates %>]}'>
 			
 			<br>
@@ -416,27 +428,33 @@
 	    	</div> -->
 	    	
 	    	<div class="container_12">
-	        	<div class="grid_5"><b>Username: </b></div>
-	        	<div class="grid_7"><%= username %></div>
+	        	<div class="grid_6"><b>Username: </b></div>
+	        	<div class="grid_6"><%= username %></div>
+	        </div>
+	        
+	        <!-- <p id="upgrade-account" style="display: <%= display %>"><b>Upgrade acccount:</b></p> -->
+	        <div class="container_12">
+	        	<div class="grid_6" style="margin-top: 10px"><b>Register Code:</b></div>
+	        	<div class="grid_6"><input id="code-input" type="text" data-mini="true" value="<%= code %>"></div>
 	        </div>
 	    	
 	    	<!-- <p><b>Username: </b> <%= username %></p> -->
 	    	
-	        <p><b>Change Password:</b></p>
+	        <b>Change Password:</b>
 	        
 	        <div class="container_12">
-	        	<div class="grid_5" style="margin-top: 10px">New Password:</div>
-	        	<div class="grid_7"><input id="pass-input" type="text" data-mini="true"></div>
+	        	<div class="grid_6" style="margin-top: 10px">New Password:</div>
+	        	<div class="grid_6"><input id="pass-input" type="text" data-mini="true"></div>
 	        </div>
 	        <div class="container_12">
-	        	<div class="grid_5" style="margin-top: 10px">Repeat Password:</div>
-	        	<div class="grid_7"><input id="pass-input" type="text" data-mini="true"></div>
+	        	<div class="grid_6" style="margin-top: 10px">Repeat Password:</div>
+	        	<div class="grid_6"><input id="pass-input" type="text" data-mini="true"></div>
 	        </div>
 	        
-	        <div class="container_12">
-	        	<div class="grid_5">&nbsp;</div>
-	        	<div class="grid_7"><input id="pass-change" type="button" name="Submit" value="Submit"/></div>
-	        </div>
+	        <!-- <div class="container_12">
+	        	<div class="grid_5">&nbsp;</div> -->
+	        	<div ><input id="save-changes" type="button" name="Submit" value="Submit Changes"/></div>
+	        <!-- </div> -->
 	        
 	        <!-- <div data-role="fieldcontain">
 	      		<label for="pass-input">New Password:</label>
@@ -450,22 +468,26 @@
     	  
 		  	<!-- <input id="pass-change" type="button" name="Submit" value="Submit"/> -->
 	    </script>
-	    
+	    <!-- <h5 style="margin-top: 7px; margin-bottom: 7px;"> -->
 	    
 	    <script type="text/template" id="event-sub-template">
-	      	<fieldset class="ui-grid-b">
-	      		<h5 class="ui-block-a" style="margin-top: 15px"><%= name %></h5>
-				<div class="ui-block-b"><input data-mini="true" class="edit" type="button" value="Edit" /></div>
-				<div class="ui-block-c"><label>Remove<input id="remove"class="remove" data-mini="true" type="checkbox" value="Remove" /></label></div>	   
-			</fieldset>
+	      	<div class="container_12">
+	      		<div class="grid_5"style="margin-top: 14px"><b style="font-size:small;"><%= name %></b></div>
+				<div class="grid_3"><input class="sub-edit"data-mini="true" class="edit" type="button" value="Edit" /></div>
+				<div class="grid_4"><label class="remove-sub">Remove<input data-mini="true" type="checkbox" value="Remove" /></label></div>	   
+			</div>
 	    </script>
 	    
 	    <script type="text/template" id="user-subscription-settings">
 			<h3>One-Time Subscriptions</h3>
+			<div id="no-once" style="display: none">You have no subscriptions.</div>
 			<div id="once-subs"></div>
 			
 			<h3>Recurring Subscriptions</h3>
+			<div id="no-recur" style="display: none">You have no subscriptions.</div>
 			<div id="recur-subs"></div>
+			
+			<br>
 			
 	    	<div class="ui-grid-a">
 		    	<div class="ui-block-a"><button id="undo-changes" type="button">Undo Changes</button></div>

@@ -1,5 +1,8 @@
 var currentView = null;
 var viewStack = new Array();
+var maxHistory = 20;
+
+var LoginView;
 
 /*
  * Events
@@ -24,6 +27,47 @@ var EventSubView;
 var CalendarView;
 var CalendarEventView;
 var CalendarListView;
+
+/**
+ * All views 
+ */
+
+var appViews = {
+	"EventView": 			function(){return new EventView;},
+	"TwoWeekView": 			function(){return new TwoWeekView;},
+	"AddEventView": 		function(){return new AddEventView;},
+	"UserProfileView": 		function(){return new UserProfileView;},
+	"UserSubscriptionView": function(){return new UserSubscriptionView;},
+	"EventSubView": 		function(){return new EventSubView;},
+	"CalendarView": 		function(){return new CalendarView;},
+	"LoginView": 			function(){return new LoginView;},
+};
+
+var appViewTitles = {
+	"EventView": 			"",
+	"TwoWeekView": 			"Two Week View",
+	"AddEventView": 		"Add An Event",
+	"UserProfileView": 		"Profile",
+	"UserSubscriptionView": "Subscriptions",
+	"EventSubView": 		"",
+	"CalendarView": 		"Event Calendar",
+	"LoginView": 			"Login",
+};
+
+/**
+ * History 
+ */
+var appHistory = new Array();
+
+function toggleBackButton() {
+	if(appHistory.length <= 1) {
+		console.info("Disabling back button");
+		$("#back-button").prop("disabled", true).addClass("ui-state-disabled");
+	}
+	else {
+		$("#back-button").removeAttr("disabled").removeClass("ui-state-disabled");
+	}
+}
 
 function destroyView(view) {
 	if(view) {
@@ -53,27 +97,48 @@ function pushView(newView) {
 }
 
 function replaceView(newView) {
-	destroyView(viewStack.pop());
-	viewStack.push(newView);
-}
+	$("#header-title").html(appViewTitles[newView]);
+	//destroyView(viewStack.pop());
+	//viewStack.push(newView);
+	if(appHistory.length > 1) {
+		destroyView(currentView);
+	}
 	
-// function openAddEvent() {
-	// $("#externalpanel").panel("close");
-	// replaceView(new AddEventView);
-	// //new AddEventView;
-// };
-// 
-// function openViewEvents() {
-	// $("#externalpanel").panel("close");
-// 	
-	// //new TwoWeekView;
-// };
+	// If we exceed the max history cache, dump oldest entry.
+	if(appHistory.length > maxHistory) {
+		console.info("Dumping old history. That's funny somehow.");
+		appHistory.shift();
+	}
+	
+	//console.info(newView + " " + typeof newView);
+	//console.info(appViews[newView]);
+	appHistory.push(newView);
+	currentView = appViews[newView]();
+	
+	toggleBackButton();
+	//console.info(appHistory[appHistory.length-1]);
+}
 
 function changeView(newView) {
 	$("#externalpanel").panel("close");
 	$("#settings-footer").css("display", "none");
 	replaceView(newView);
+	console.info(appHistory);
 };
+
+function goBack() {
+	if(appHistory.length > 1) {
+		appHistory.pop();
+		console.info(appHistory);
+		console.info("Going back to: " + appHistory[appHistory.length-1]);
+		changeView(appHistory[appHistory.length-1]);
+		// Don't want to re-add the current view that we just went back to, to the history
+		appHistory.pop();
+		console.info(appHistory);
+	}
+	
+	toggleBackButton();
+}
 
 function openCalendar() {
 	//$("#externalpanel").panel("close");
@@ -111,17 +176,32 @@ $(function(){
 	Parse.initialize("YLd15d5BJbPaS7tSgNlu3xEKqGncBEj52ZbFbyr0", "4SlWcqTqRapDZOwTh1ZVeSg96vqTRhon4ZPROvjg");
 
 	FastClick.attach(document.body);
-
-
-	$("#menu-add-event").click(function(){changeView(new AddEventView); return false;});
-	$("#menu-view-events").click(function(){changeView(new TwoWeekView); return false;});
-	$("#event-calendar").click(function(){changeView(new CalendarView); return false;});
-	$("#menu-account-settings").click(function(){
-		$("#profile-settings").attr("class", "ui-btn ui-link ui-btn-active"); 
-		changeView(new UserProfileView); 
+	
+	function activateFooter(id) {
+		$("#profile-settings").removeClass("ui-btn-active"); 
+		$("#settings-settings").removeClass("ui-btn-active"); 
+		$("#subs-settings").removeClass("ui-btn-active"); 
+		
+		$("#" + id + "-settings").addClass("ui-btn ui-link ui-btn-active"); 
 		$("#settings-footer").css("display", "block");
-		return false;
-	});
+	};
+
+
+	$("#menu-add-event").click(function(){changeView("AddEventView"); return false;});
+	$("#menu-view-events").click(function(){changeView("TwoWeekView"); return false;});
+	$("#event-calendar").click(function(){changeView("CalendarView"); return false;});
+	
+	
+	$("#menu-account-profile").click(function(){changeView("UserProfileView"); activateFooter("profile");return false;});
+	$("#menu-account-settings").click(function(){changeView("UserProfileView"); activateFooter("settings");return false;});
+	$("#menu-account-subs").click(function(){changeView("UserSubscriptionView"); activateFooter("subs");return false;});
+	
+	// $("#menu-account-settings").click(function(){
+		// $("#profile-settings").attr("class", "ui-btn ui-link ui-btn-active"); 
+		// changeView(new UserProfileView); 
+		// $("#settings-footer").css("display", "block");
+		// return false;
+	// });
 	
 	$("#page").on("swiperight", function(){$("#externalpanel").panel("open"); return false;});
 	$.event.special.swipe.verticalDistanceThreshold = 25;

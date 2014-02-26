@@ -5,7 +5,7 @@
 
 $(function(){
 	
-	// FIXME: Take out for deployment!
+	// FIXME: Take out for deployment! 981595309153 AIzaSyBfkxsYYXBLV5UN3-vUrZKIl54yXTcAVnI
 	Parse.User.logOut();
 	
 	/*
@@ -36,6 +36,11 @@ $(function(){
 				- Girly things (themes)
 				
 		FIXME: LAST TIME:
+				- Creating anon users. Just make them use password for now...
+				- Create upgrade code cron job.
+				- Create registered user Role in Parse
+		
+		
 				- Overriding set calendar event to allow me to popup a dialog with all events that day
 				- Each event listing will have a view and subscribe button. Like a mashup of TwoWeekView and Subscription settings
 		
@@ -44,9 +49,12 @@ $(function(){
 				- Time (e.g 12:34 pm) Not displaying correctly on Android event view
 	
 		FIXME: 	Offline solution - After thought
-					- Eventual support/notice of older version, e.g "Warning: You're device is using an older version of browser X. Some features may not work."
+					- Eventual support/notice of older version, e.g "Warning: You're device is using an older version of browser X. Some features may not work. Like database"
 				Header displays name of current page 
-				One submenu open at a time in navigation
+				ODne submenu open at a time in navigation
+				
+				Permissions
+					- Need to change all object permissions before production release
 				
 				Events
 					- Better event views/navigation
@@ -66,6 +74,9 @@ $(function(){
 					- Option to require login on app start
 					- User-chosen homepage?
 					- HOW ABOUT: No home button, but rather, move menu to right, then back button is on left
+					- General settings
+						- Give user ability to turn off auto-generated events.
+						- Auto-subscribe to all events, or specific ones (by user, date, etc)
 					
 				Proper Navigation between "pages"
 				Theme-ing
@@ -121,7 +132,7 @@ $(function(){
 	
 	*/
 	
-	var LoginView = Parse.View.extend({
+	LoginView = Parse.View.extend({
 	    events: {
 	      "submit form.login-form": "logIn",
 	      "submit form.signup-form": "signUp"
@@ -144,7 +155,8 @@ $(function(){
 	      
 	      Parse.User.logIn(username, password, {
 	        success: function(user) {
-	      	  replaceView(new AddEventView({model: (new Event({username: Parse.User.current().get("username")}))}));
+	      	  //changeView(new AddEventView({model: (new Event({username: Parse.User.current().get("username")}))}), "Add an Event");
+	      	  changeView("TwoWeekView");
 	          //self.undelegateEvents();
 	          //delete self;
 	        },
@@ -167,7 +179,9 @@ $(function(){
 	      
 	      Parse.User.signUp(username, password, { ACL: new Parse.ACL() }, {
 	        success: function(user) {
-	      	  replaceView(new AddEventView({model: (new Event({username: Parse.User.current().get("username")}))}));
+	      	  //changeView("AddEventView"({model: (new Event({username: Parse.User.current().get("username")}))}), "Add an Event");
+	      	  changeView("TwoWeekView");
+	      	  appHistory = new Array();
 	          //self.undelegateEvents();
 	          //delete self;
 	        },
@@ -191,12 +205,16 @@ $(function(){
 	  
 	
 	if(Parse.User.current()) {
-		replaceView(new AddEventView);
+		//new TwoWeekView;
+		replaceView("TwoWeekView");
 		//viewStack.push(new AddEventView);
 	}
 	else {
-		replaceView(new LoginView);
+		//new LoginView;
+		replaceView("LoginView");
 		//viewStack.push(new LoginView);
 	}
+	
+	appHistory = new Array();
 	//new TwoWeekView;
 });
