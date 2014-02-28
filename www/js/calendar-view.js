@@ -92,6 +92,7 @@ $(function(){
 		      
 		      	var view = new EventView({model: event});
 		      	view.subed = subed;
+		      	view.owner = event.get('username') == Parse.User.current().get('username');
 		      	
 		      	self.displayedEvents.push(view);
 		      

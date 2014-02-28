@@ -5,7 +5,7 @@
 
 $(function(){
 	
-	// FIXME: Take out for deployment! 981595309153 AIzaSyBfkxsYYXBLV5UN3-vUrZKIl54yXTcAVnI
+	// FIXME: Take out for deployment! 981595309153 AIzaSyBfkxsYYXBLV5UN3-vUrZKIl54yXTcAVnI <- GCM
 	Parse.User.logOut();
 	
 	/*
@@ -36,9 +36,9 @@ $(function(){
 				- Girly things (themes)
 				
 		FIXME: LAST TIME:
-				- Creating anon users. Just make them use password for now...
-				- Create upgrade code cron job.
-				- Create registered user Role in Parse
+				- Edit/Delete events (delete done)
+				X Unsubscribe
+				- Permissions locked in for Add Event (only registered can create)
 		
 		
 				- Overriding set calendar event to allow me to popup a dialog with all events that day
@@ -128,7 +128,7 @@ $(function(){
 				- Add another button "Subscribe to All" or "Subscribe once"
 				
 		FIXME: Passwordless authentication
-				- Hash device uuid and use as password for login.
+				- Hash device uuid and use as password for login?
 	
 	*/
 	

@@ -186,11 +186,15 @@ $(function(){
 		},
 		
 		displayEvents: function (self, results, hasRecur) {
-			if(!self.hasRecurring(results)) {
-				self.$("#no-once").css('display', 'block');
-			}
+			// if(!self.hasRecurring(results)) {
+				// self.$("#no-once").css('display', 'block');
+			// }
 			
 			if(results.length == 0) {
+				self.$("#no-recur").css('display', 'block');
+				self.$("#no-once").css('display', 'block');
+			}
+			else if(!self.hasRecurring(results)) {
 				self.$("#no-recur").css('display', 'block');
 			}
 			

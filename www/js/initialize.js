@@ -33,14 +33,14 @@ var CalendarListView;
  */
 
 var appViews = {
-	"EventView": 			function(){return new EventView;},
-	"TwoWeekView": 			function(){return new TwoWeekView;},
-	"AddEventView": 		function(){return new AddEventView;},
-	"UserProfileView": 		function(){return new UserProfileView;},
-	"UserSubscriptionView": function(){return new UserSubscriptionView;},
-	"EventSubView": 		function(){return new EventSubView;},
-	"CalendarView": 		function(){return new CalendarView;},
-	"LoginView": 			function(){return new LoginView;},
+	"EventView": 			function(args){return new EventView(args);},
+	"TwoWeekView": 			function(args){return new TwoWeekView(args);},
+	"AddEventView": 		function(args){return new AddEventView(args);},
+	"UserProfileView": 		function(args){return new UserProfileView(args);},
+	"UserSubscriptionView": function(args){return new UserSubscriptionView(args);},
+	"EventSubView": 		function(args){return new EventSubView(args);},
+	"CalendarView": 		function(args){return new CalendarView(args);},
+	"LoginView": 			function(args){return new LoginView(args);},
 };
 
 var appViewTitles = {
@@ -59,7 +59,7 @@ var appViewTitles = {
  */
 var appHistory = new Array();
 
-function toggleBackButton() {
+function updateBackButton() {
 	if(appHistory.length <= 1) {
 		console.info("Disabling back button");
 		$("#back-button").prop("disabled", true).addClass("ui-state-disabled");
@@ -74,7 +74,9 @@ function destroyView(view) {
 	    //COMPLETELY UNBIND THE VIEW
 	    view.undelegateEvents();
 	
-	    //view.$el.removeData().unbind(); 
+	    view.$el.removeData().unbind(); 
+	    view.$el.empty();
+	    //view.stopListening();
 	
 	    //Remove view from DOM. NOTE: This also deleted the 'content' div, thus, no views could attach to it. 
 	    //view.remove();  
@@ -96,13 +98,18 @@ function pushView(newView) {
 	viewStack.push(newView);
 }
 
-function replaceView(newView) {
+function replaceView(newView, argsObj) {
 	$("#header-title").html(appViewTitles[newView]);
 	//destroyView(viewStack.pop());
 	//viewStack.push(newView);
-	if(appHistory.length > 1) {
-		destroyView(currentView);
+	if(typeof argsObj == 'undefined') {
+		argsObj = {};
 	}
+	else {
+		console.info("Arguments for view (" + newView +"): " + JSON.stringify(argsObj));
+	}
+	
+	destroyView(currentView);
 	
 	// If we exceed the max history cache, dump oldest entry.
 	if(appHistory.length > maxHistory) {
@@ -113,16 +120,16 @@ function replaceView(newView) {
 	//console.info(newView + " " + typeof newView);
 	//console.info(appViews[newView]);
 	appHistory.push(newView);
-	currentView = appViews[newView]();
+	currentView = appViews[newView](argsObj);
 	
-	toggleBackButton();
+	updateBackButton();
 	//console.info(appHistory[appHistory.length-1]);
 }
 
-function changeView(newView) {
+function changeView(newView, argsObj) {
 	$("#externalpanel").panel("close");
 	$("#settings-footer").css("display", "none");
-	replaceView(newView);
+	replaceView(newView, argsObj);
 	console.info(appHistory);
 };
 
@@ -137,7 +144,7 @@ function goBack() {
 		console.info(appHistory);
 	}
 	
-	toggleBackButton();
+	updateBackButton();
 }
 
 function openCalendar() {

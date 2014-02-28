@@ -111,7 +111,7 @@
 		    </div>
 		    
 		    
-    		<div class="content">
+    		<div class="content" style="margin: 5px">
     		</div>
     		
     		<!-- 
@@ -151,11 +151,23 @@
    					data-options='{"mode":"calbox", "useSetButton":false, "useInline": true}'> -->
     		
     		<div class="ui-state-persist" id="settings-footer" data-theme="" data-role="footer" data-position="fixed" data-tap-toggle="false" data-hide-during-focus="false" style="display:none">
-    			<div data-role="navbar">
+    			<div data-role="navbar" style="border-t">
     				<ul>
-    					<li><a id="profile-settings"  href="#" onclick="replaceView('UserProfileView');appHistory.pop();">Profile</a></li>
-    					<li><a id="settings-settings" href="#" >Settings</a></li>
-    					<li><a id="subs-settings"     href="#" onclick="replaceView('UserSubscriptionView');appHistory.pop();">Subscriptions</a></li>
+    					<li><a id="profile-settings"  href="#" onclick="replaceView('UserProfileView');appHistory.pop();">
+	    						<div style="height:5px"> </div>
+	    						<div style="font-size: 13px;">Profile</div>
+							</a>
+						</li>
+    					<li><a id="settings-settings" href="#" >
+	    						<div style="height:5px"> </div>
+	    						<div style="font-size: 13px;">Settings</div>
+							</a>
+						</li>
+    					<li><a id="subs-settings"     href="#" onclick="replaceView('UserSubscriptionView');appHistory.pop();">
+	    						<div style="height:5px"> </div>
+	    						<div style="font-size: 13px;">Subscriptions</div>
+							</a>
+						</li>
     				</ul>
     			</div>
 		    </div>
@@ -266,13 +278,13 @@
 	            <label for="textinput1">
 	                Event Name:
 	            </label>
-	            <input name="" id="event-name" placeholder="" value="" data-mini="true" type="text">
+	            <input name="" id="event-name" placeholder="" value="<%= name %>" data-mini="true" type="text">
 	        </div>
 	        <div data-role="fieldcontain" data-controltype="textinput">
 	            <label for="event-desc">
 	                Event Description:
 	            </label>
-	            <textarea name="" id="event-desc" placeholder="" value=""></textarea>
+	            <textarea name="" id="event-desc" placeholder="" value=""><%= desc %></textarea>
 	        </div>
 	        <div id="event-invitation">
 		        <div data-role="fieldcontain" data-controltype="radiobuttons">
@@ -280,11 +292,11 @@
 		                <legend>
 		                    Who can come?
 		                </legend>
-		                <input id="event-anyone" name="group1" value="radio1" type="radio" checked="checked">
+		                <input id="event-anyone" name="group1" value="radio1" type="radio" <%= !invite ? "checked='checked'" : "" %>>
 		                <label for="event-anyone">
 		                    Anyone
 		                </label>
-		                <input id="event-invite" name="group1" value="radio2" type="radio">
+		                <input id="event-invite" name="group1" value="radio2" type="radio" <%= invite ? "checked='checked'" : "" %>>
 		                <label for="event-invite">
 		                    Invite Only
 		                </label>
@@ -297,7 +309,7 @@
 		                <legend>
 		                    Recurring event?
 		                </legend>
-		                <input id="event-recur" name="group3" type="checkbox">
+		                <input id="event-recur" name="group3" type="checkbox" <%= recur ? "checked='checked'" : "" %>>
 		                <label for="event-recur">
 		                	Yes
 		                </label>
@@ -310,31 +322,31 @@
 		                <legend>
 		                    Recurs every...
 		                </legend>
-		                <input id="recur-sunday" name="group4" type="checkbox">
+		                <input id="recur-sunday" name="group4" type="checkbox" <%= repeat["Sun"] ? "checked='checked'" : "" %>>
 		                <label for="recur-sunday">
 		                    Sunday
 		                </label>
-		                <input id="recur-monday" name="group4" type="checkbox">
+		                <input id="recur-monday" name="group4" type="checkbox" <%= repeat["Mon"] ? "checked='checked'" : "" %>>
 		                <label for="recur-monday">
 		                    Monday
 		                </label>
-		                <input id="recur-tuesday" name="group4" type="checkbox">
+		                <input id="recur-tuesday" name="group4" type="checkbox" <%= repeat["Tue"] ? "checked='checked'" : "" %>>
 		                <label for="recur-tuesday">
 		                    Tuesday
 		                </label>
-		                <input id="recur-wednesday" name="group4" type="checkbox">
+		                <input id="recur-wednesday" name="group4" type="checkbox" <%= repeat["Wed"] ? "checked='checked'" : "" %>>
 		                <label for="recur-wednesday">
 		                    Wednesday
 		                </label>
-		                <input id="recur-thursday" name="group4" type="checkbox">
+		                <input id="recur-thursday" name="group4" type="checkbox" <%= repeat["Thu"] ? "checked='checked'" : "" %>>
 		                <label for="recur-thursday">
 		                    Thursday
 		                </label>
-		                <input id="recur-friday" name="group4" type="checkbox">
+		                <input id="recur-friday" name="group4" type="checkbox" <%= repeat["Fri"] ? "checked='checked'" : "" %>>
 		                <label for="recur-friday">
 		                    Friday
 		                </label>
-		                <input id="recur-saturday" name="group4" type="checkbox">
+		                <input id="recur-saturday" name="group4" type="checkbox" <%= repeat["Sat"] ? "checked='checked'" : "" %>>
 		                <label for="recur-saturday">
 		                    Saturday
 		                </label>
@@ -346,12 +358,12 @@
 			                <legend>
 			                    Each...
 			                </legend>
-			                <input id="radio3" name="group2" value="radio1" type="radio" checked="checked">
-			                <label for="radio3">
+			                <input id="recur-weekly" name="group2" value="radio1" type="radio" <%=  each ? "checked='checked'" : "" %>>
+			                <label for="recur-weekly">
 			                    Week
 			                </label>
-			                <input id="radio4" name="group2" value="radio4" type="radio">
-			                <label for="radio4">
+			                <input id="recur-monthly" name="group2" value="radio4" type="radio" <%= !each ? "checked='checked'" : "" %>>
+			                <label for="recur-monthly">
 			                    Month
 			                </label>
 			            </fieldset>
@@ -361,15 +373,15 @@
 	        <div>
 		        <label for="event-start">Start Date:</label>
 				<input name="event-start" id="event-start" type="date" data-role="datebox"
-				   data-options='{"mode": "calbox"}'>
+				   data-options='{"mode": "calbox", "defaultValue":  "<%= defaultDate %>" }'>
 		    
 		    	<label for="start-time">Start Time:</label>
 				<input name="start-time" id="start-time" type="date" data-role="datebox"
-				   data-options='{"mode": "timebox", "overrideTimeFormat": 12}'>
+				   data-options='{"mode": "timebox", "overrideTimeFormat": 12, "defaultValue":  "<%= defaultStartTime %>" }'>
 				   
 			    <label for="end-time">End Time:</label>
 				<input name="myend-timedate" id="end-time" type="date" data-role="datebox"
-				   data-options='{"mode": "timebox", "overrideTimeFormat": 12}'>
+				   data-options='{"mode": "timebox", "overrideTimeFormat": 12, "defaultValue":  "<%= defaultEndTime %>" }'>
 		   </div>
         	<input class="add-event" value="Submit" type="submit" style="width:50%">
 	    </script>
@@ -393,10 +405,19 @@
 				<div style="display:<%= (recur) ? 'block' : 'none' %>"><b>Recurs:</b> Every <%= (each == 0) ? 'week' : 'month' %> on <%= recurring %> </div>
 				<b>Started by:</b> <%= username %><br /><br />
 				
-				<%= desc.replace(new RegExp('\r?\n', 'g'), '<br />') %><br />
+				<%= desc.replace(new RegExp('\r?\n', 'g'), '<br />') %><br /><br />
 				
-				<button data-role="button" data-mini="true" class="subscribe" style="width:100px" <%= subed ? 'disabled="true"' : 'enabled="true"' %> >
+				<button data-role="button" data-mini="true" class="subscribe" style="width:100px; display: inline" <%= subed ? 'disabled="true"' : 'enabled="true"' %> >
 					<%= subed ? 'Subscribed!' : 'Subscribe' %>
+				</button>
+				<button data-role="button" data-mini="true" class="desub" style="width:100px; display: inline" <%= subed ?  'enabled="true"' : 'disabled="true"' %> >
+					Unsubscribe
+				</button>
+				<button data-role="button" data-mini="true" class="edit" style="width:100px; display:  <%= owner ? 'inline' : 'none' %> ">
+					Edit
+				</button>
+				<button data-role="button" data-mini="true" class="delete" style="width:100px; display:  <%= owner ? 'inline' : 'none' %> ">
+					Delete
 				</button>
 			</div>
 	    </script>
@@ -472,8 +493,8 @@
 	    
 	    <script type="text/template" id="event-sub-template">
 	      	<div class="container_12">
-	      		<div class="grid_5"style="margin-top: 14px"><b style="font-size:small;"><%= name %></b></div>
-				<div class="grid_3"><input class="sub-edit"data-mini="true" class="edit" type="button" value="Edit" /></div>
+	      		<div class="grid_8"style="margin-top: 14px"><b style="font-size:small;"><%= name %></b></div>
+				<!-- <div class="grid_3"><input class="sub-edit"data-mini="true" class="edit" type="button" value="Edit" /></div> -->
 				<div class="grid_4"><label class="remove-sub">Remove<input data-mini="true" type="checkbox" value="Remove" /></label></div>	   
 			</div>
 	    </script>

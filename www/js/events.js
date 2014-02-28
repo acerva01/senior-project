@@ -24,8 +24,8 @@ $(function(){
 	
 	Event = Parse.Object.extend("Event", {
 		defaults: {
-			name:   "Default",
-			desc:   "Default",
+			name:   "",
+			desc:   "",
 			start:  new Date(),
 			end:    new Date(),
 			invite: false,
@@ -44,11 +44,12 @@ $(function(){
 	    initialize: function() {
 	    	var self = this;
 	    	var usr = Parse.User.current();
+	    	var username = Parse.User.current().get('username');
     		var ACL = new Parse.ACL(usr);
     		
     		ACL.setPublicReadAccess(true);
 	    	
-	    	self.set({"ACL": ACL, "user": usr});
+	    	self.set({"ACL": ACL, "user": usr, "username": username});
 	    }
 	});	
 	
@@ -58,13 +59,41 @@ $(function(){
 			"change #event-recur": "toggleRecur"
 		},
 		
-		model: new Event(),
-		
 		el: ".content",
 		
 		initialize: function() {
+			var self = this;
 			_.bindAll(this, "saveEvent", "toggleRecur");
-	        this.$el.html(_.template($("#add-event-template").html()));
+			
+			if(typeof self.options.editing == 'undefined') {
+				console.info("Editing was not defined. New event being added.");
+	        	self.model = new Event();
+			}
+			else {
+				self.model = self.options.model;
+			}
+			
+			console.info(self.model);
+			console.info(self.options);
+			console.info(moment(this.model.get('start')).format("YYYY-MM-DD"));
+			console.info(moment(this.model.get('start')).format("HH:ss"));
+			console.info(moment(this.model.get('end')).format("HH:ss"));
+			
+	        var template = _.template($("#add-event-template").html());
+	        
+	        this.$el.html(template({
+	        	name:   self.model.get('name'),
+				desc:   self.model.get('desc'),
+				start:  self.model.get('start'),
+				end:    self.model.get('end'),
+				invite: self.model.get('invite'),
+				recur:  self.model.get('recur'),
+				repeat: self.model.get('repeat'),
+				each:	self.model.get('each') == 0,
+				defaultDate:		moment(this.model.get('start')).format("YYYY-MM-DD"),
+				defaultStartTime:	moment(this.model.get('start')).format("HH:ss"),
+				defaultEndTime:		moment(this.model.get('end')).format("HH:ss")
+	        }));
 	        
 	        console.info(new Date());
 	        
@@ -72,13 +101,17 @@ $(function(){
 	        this.eventDesc  = this.$('#event-desc');
 	        this.invite		= this.$('#event-anyone');
 	        this.recur		= this.$('#event-recur');
+	        this.weekly		= this.$("#recur-weekly");
 	        this.start		= this.$('#event-start');
 	        this.startTime	= this.$('#start-time');
 	        this.endTime	= this.$('#endTime');
 	        this.repeat		= {'Sun':false, 'Mon':false, 'Tue':false, 'Wed':false, 'Thu':false, 'Fri':false,'Sat':false};
 	        this.repeatMap 	= {0:'Sun', 1:'Mon', 2:'Tue', 3:'Wed', 4:'Thu', 5:'Fri', 6:'Sat'};
 	        
-	        this.$('#event-recurrence').css("display", "none");	        
+	        if(!this.model.get('recur')){
+	        	this.$('#event-recurrence').css("display", "none");	 
+	        }  
+	             
 			this.render();
 		},
 		
@@ -99,19 +132,32 @@ $(function(){
 				function(ndx, obj){
 					self.repeat[self.repeatMap[ndx]] = $(this).is(":checked");
 				});
+			
+			console.info("Saving Event");
 				
-			this.model.save({
+			self.model.save({
 				name: 	this.eventName.val(),
 				desc: 	this.eventDesc.val(),
 				invite: !this.invite.is(":checked"),
 				recur:	this.recur.is(":checked"),
+				each:	(this.weekly.is(":checked") ? 0 : 1),
 				repeat: this.repeat,
 				start:	this.createDate(this.start.val(), this.startTime.val()),
 				user: Parse.User.current(),
 				username: Parse.User.current().get("username")
-			}).then(function(obj){
-				self.model = new Event({username: Parse.User.current().get("username")});
-			});
+			}).then(
+				function(obj){
+					//console.info("Save success, creating new Event model.");
+					console.info(self.model);
+					//self.model.clear();
+					console.info(self.model);
+					//self.model = new Event({username: Parse.User.current().get("username")});
+					console.info(self.model);
+				},
+				function(error) {
+					alert("Error saving event: " + error.message);
+				}
+			);
 		},
 		//
 		//
@@ -162,7 +208,10 @@ $(function(){
 	
 	EventView = Parse.View.extend({	
 		events: {
-			"click button.subscribe" : "subscribe"
+			"click button.subscribe" : "subscribe",
+			"click button.edit" : "edit",
+			"click button.desub" : "unsubscribe",
+			"click button.delete" : "deleteEvent"
 		},
 			
 		el: "<div class='event-item-collapse' data-role='collapsible' data-iconpos='right'>",
@@ -183,13 +232,49 @@ $(function(){
 			// });
 			
 			self.$("button.subscribe").attr("disabled", "true");
+			//self.$("button.desub").removeAttr("disabled");
+			
+			var buttonObj = self.$("button.subscribe");
+			buttonObj.html(buttonObj.html().replace("Subscribe", "Subscribing..."));
+			
 			//self.$("button.subscribe").attr("value", "Subscribed &check;").trigger('create');
 			// FIXME: Subscribed! After subscribe
 			var sub = new Sub({
 				event: self.model,
 				recurring: self.model.get("recur") // FIXME: This is not correct! 
 			});
-			sub.save();
+			sub.save().then(
+				function(){
+					buttonObj.html(buttonObj.html().replace("Subscribing...", "Subscribed!"));
+				},
+				function(error){
+					alert("Error saving subscription: " + error.message);
+				}
+			);
+		},
+		
+		edit: function() {
+			var self = this;
+			replaceView("AddEventView", {model: self.model, editing: true});
+		},
+		
+		deleteEvent: function() {
+			var self = this;
+			self.model.destroy();
+					
+			self.undelegateEvents();
+		    self.$el.removeData().unbind(); 
+		    self.remove();  
+	    	delete self;
+		},
+		
+		unsubscribe: function() {
+			var self = this;
+			
+			self.$("button.desub").attr("disabled", "true");
+			//self.$("button.subscribe").removeAttr("disabled");
+			
+			self.options.subscription.destroy();
 		},
 		
 		render: function() {
@@ -218,7 +303,7 @@ $(function(){
 		    var recur = this.model.get('recur');
 		    var username = this.model.get('username');
 		    var subed = self.subed;
-		    
+		    var owner = self.owner;
 		    //console.log(repeat);
 		    
 		    recurring = (repeat["Sun"] ? "Sun, " : "") +
@@ -241,6 +326,7 @@ $(function(){
 		  		endDate: endDate,
 		  		end: end,
 		  		subed: subed,
+		  		owner: owner,
 		  		recur: recur,
 		  		each: each,
 		  		recurring: recurring,
@@ -316,16 +402,14 @@ $(function(){
 		},
 		
 		hasSubscription: function(self, event) {
-			var result = false;
 			for(var i=0; i < self.subs.length; i++) {
 				//if(self.subs[i] == event.id) {
 				if(self.subs[i].get('event').id == event.id) {
-					result = true;
-					break;
+					return self.subs[i];
 				}
 			}
 			
-			return result;
+			return null;
 		},
 		
 		displayEvents: function (self, results, weekOneEnd) {
@@ -334,8 +418,9 @@ $(function(){
 		      	
 		      	var subed = self.hasSubscription(self, event);
 		      
-		      	var view = new EventView({model: event});
-		      	view.subed = subed;
+		      	var view = new EventView({model: event, subscription: subed});
+		      	view.subed = (subed != null);
+		      	view.owner = event.get('username') == Parse.User.current().get('username');
 		      
 		      	if(event.get('start').getTime() < weekOneEnd.getTime()) {
 			  		$(self.elemStr + " > #two-week-view > .week1").append(view.render().el);
