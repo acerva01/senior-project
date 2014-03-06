@@ -36,10 +36,14 @@ $(function(){
 				- Girly things (themes)
 				
 		FIXME: LAST TIME:
-				- Edit/Delete events (delete done)
+				X Edit/Delete events
 				X Unsubscribe
-				- Permissions locked in for Add Event (only registered can create)
+				X Permissions locked in for Add Event (only registered can create)
 		
+				- Get recurring events onto Calendar
+					- Create calendar generators for events (i.e. People's Kitchen)
+				- Push notifications
+				- User feedback elements (Did my submit go through?)
 		
 				- Overriding set calendar event to allow me to popup a dialog with all events that day
 				- Each event listing will have a view and subscribe button. Like a mashup of TwoWeekView and Subscription settings
@@ -131,6 +135,77 @@ $(function(){
 				- Hash device uuid and use as password for login?
 	
 	*/
+	function generateNotifcations(delay) {
+		var now = moment();
+		var queue = new Array();
+		var listStr = "";
+		
+		console.info("Now: " + now.toString());
+		
+		_.each(eventStartTimes, function(event) {
+			var start = moment(event.get('start'));
+			
+			//console.info("Event Start: " + start.toString() + " and Diff: " + start.diff(now, 'minutes'));
+			
+			if(start.diff(now, 'minutes') <= 30 && !(event in shownNotifications)) {
+				queue.push(event);
+			}
+		});
+		
+		
+		
+		$("#generic-dialog > .dlg-header").empty();
+		$("#generic-dialog > .dlg-header").append("<h2>Notifications</h2>");
+		
+		$("#generic-dialog > .dlg-content").empty();
+		//$("#generic-dialog > .dlg-content").append("<ul></ul>");
+		
+		_.each(queue, function(item) {
+			listStr += "<li>" + item.get('name') + "</li>";
+			//$("#generic-dialog > .dlg-content > ul").append("<li>" + item.get('name') + "</li>");
+			shownNotifications[item] = 1;
+		});
+		
+		
+		console.info("Notification search complete: " + queue.length +"\nList string: " + listStr);
+		
+		if(queue.length > 0) {
+			$("#generic-dialog > .dlg-content").append("<ul>" + listStr + "</ul>");
+			$.mobile.changePage("#generic-dialog");
+		}
+		
+		setTimeout(generateNotifcations, delay, [delay]);
+	}
+	
+	function startTimeTracking() {
+		var query = new Parse.Query("Sub");
+	  	query.equalTo("owner", Parse.User.current());
+	  	query.include("event");
+	  	query.find({	
+	  		success: function(subs) {
+	  			console.info("Subscriptions for notifcations: " + subs.length);
+	  			
+	  			for(var i=0; i < subs.length; i++){
+	  				eventStartTimes.push(subs[i].get('event'));
+	  			}
+		
+				
+	  			console.info("Starting timer thingy");
+				var minOffset = 5 - (new Date()).getMinutes()%5;
+				var secOffset = (new Date()).getSeconds();
+				var delay = ((minOffset*60) - secOffset)*1000;
+				
+				console.info("Starting about " + minOffset + " min(s) from now.");
+				
+				// Get the timeout started on the 5 minute mark. Every 5 minutes on the hour.
+				setTimeout(generateNotifcations, delay, [5*60*1000]);
+	  			
+	  		},
+	  		error: function(error) {
+		    	console.error("Error retrieving subscriptions: " + error.code + " " + error.message);
+	  		}
+	  	});
+	}
 	
 	LoginView = Parse.View.extend({
 	    events: {
@@ -159,11 +234,12 @@ $(function(){
 	      	  changeView("TwoWeekView");
 	          //self.undelegateEvents();
 	          //delete self;
+	          startTimeTracking();
 	        },
 	
 	        error: function(user, error) {
 	          self.$(".login-form .error").html("Invalid username or password. Please try again.").show();
-	          this.$(".login-form button").removeAttr("disabled");
+	          self.$(".login-form button").removeAttr("disabled");
 	        }
 	      });
 	
@@ -184,6 +260,7 @@ $(function(){
 	      	  appHistory = new Array();
 	          //self.undelegateEvents();
 	          //delete self;
+	          startTimeTracking();
 	        },
 	
 	        error: function(user, error) {

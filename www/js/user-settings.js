@@ -132,7 +132,7 @@ $(function(){
 		  			//self.subs = subs;
 		  			
 		  			console.info(subs.length);
-		  			console.info(subs);
+		  			//console.info(subs);
 		  			console.log("displaying subs");
 		  			
 		  			self.displayEvents(self, subs);
@@ -218,7 +218,7 @@ $(function(){
 			  	
 			  	self.subViews.push(view);
 		    }
-			console.log(self.subViews);
+			//console.log(self.subViews);
 		    
 		    self.$el.trigger('create');
 		},

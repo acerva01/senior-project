@@ -186,9 +186,9 @@
 	            <ul data-role="listview" style="padding-right: 8px">
 	                <li data-icon="false"><a id="menu-add-event"   		href="#">Add Event</a></li>
 	                <li data-icon="false"><a id="menu-view-events" 		href="#">View Events</a></li>
-	                <!-- <li data-icon="false"><a id="menu-account-settings" href="#">Settings</a></li> -->
 	                <li data-icon="false"><a id="event-calendar" 		href="#">Calendar</a></li>
-	                <li data-role="collapsible" data-iconpos="right" data-inset="false" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" style="padding: 0; border: 0;">
+	                <li data-icon="false"><a id="menu-account-profile"  href="#">Settings</a></li>
+	                <!-- <li data-role="collapsible" data-iconpos="right" data-inset="false" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" style="padding: 0; border: 0;">
 	                    <h2 style="margin: 0;">Settings</h2>
 	                    <ul data-role="listview" class="red">
 	                        <li data-icon="false"><a id="menu-account-profile" 	href="#">Profile</a></li>
@@ -205,7 +205,7 @@
 	                        <li data-icon="false"><a href="#">Item 3</a></li>
 	                    </ul>
 	                </li>
-	                <li data-icon="false"><a href="#" style="border: 0">Submenu 6</a></li>
+	                <li data-icon="false"><a href="#" style="border: 0">Submenu 6</a></li> -->
 	            </ul>
 	        </div>
     		
@@ -216,6 +216,23 @@
 				<h2>Dialog</h2>
 			</div>
 			<div role="main" class="ui-content">
+			</div>
+		</div>
+		
+		<div data-role="dialog" id="register-dialog">
+			<div data-role="header">
+				<h2>Registration Required</h2>
+			</div>
+			<div data-role="content">
+				<p>Please register in order to create events. This helps mitigate spam. You can register in your Profile settings.</p>
+				<p>Thank you!</p>
+			</div>
+		</div>
+		
+		<div data-role="dialog" id="generic-dialog">
+			<div class="dlg-header" data-role="header">
+			</div>
+			<div class="dlg-content" data-role="content">
 			</div>
 		</div>
 		
@@ -370,20 +387,25 @@
 			        </div>
 		        </div>
 	        </div>
+	        <br>
 	        <div>
 		        <label for="event-start">Start Date:</label>
 				<input name="event-start" id="event-start" type="date" data-role="datebox"
-				   data-options='{"mode": "calbox", "defaultValue":  "<%= defaultDate %>" }'>
+				   data-options='{"mode": "calbox"}'>
+				   
+				<label for="event-end">End Date:</label>
+				<input name="event-end" id="event-end" type="date" data-role="datebox"
+				   data-options='{"mode": "calbox"}'>
 		    
 		    	<label for="start-time">Start Time:</label>
 				<input name="start-time" id="start-time" type="date" data-role="datebox"
-				   data-options='{"mode": "timebox", "overrideTimeFormat": 12, "defaultValue":  "<%= defaultStartTime %>" }'>
+				   data-options='{"mode": "timebox", "overrideTimeFormat": 12}'>
 				   
 			    <label for="end-time">End Time:</label>
-				<input name="myend-timedate" id="end-time" type="date" data-role="datebox"
-				   data-options='{"mode": "timebox", "overrideTimeFormat": 12, "defaultValue":  "<%= defaultEndTime %>" }'>
+				<input name="end-time" id="end-time" type="date" data-role="datebox"
+				   data-options='{"mode": "timebox", "overrideTimeFormat": 12}'>
 		   </div>
-        	<input class="add-event" value="Submit" type="submit" style="width:50%">
+        	<button class="add-event">Submit</button>
 	    </script>
 	    
 	    <!--------------------------------------------------------------------------------------------------
@@ -407,16 +429,16 @@
 				
 				<%= desc.replace(new RegExp('\r?\n', 'g'), '<br />') %><br /><br />
 				
-				<button data-role="button" data-mini="true" class="subscribe" style="width:100px; display: inline" <%= subed ? 'disabled="true"' : 'enabled="true"' %> >
+				<button data-role="button" data-mini="true" class="subscribe" style="width:100px; display: <%= subed ?  'none' : 'inline' %>" <%= subed ? 'disabled="true"' : 'enabled="true"' %> >
 					<%= subed ? 'Subscribed!' : 'Subscribe' %>
 				</button>
-				<button data-role="button" data-mini="true" class="desub" style="width:100px; display: inline" <%= subed ?  'enabled="true"' : 'disabled="true"' %> >
+				<button data-role="button" data-mini="true" class="desub" style="width:100px; display: <%= subed ?  'inline' : 'none' %>" <%= subed ?  'enabled="true"' : 'disabled="true"' %> >
 					Unsubscribe
 				</button>
-				<button data-role="button" data-mini="true" class="edit" style="width:100px; display:  <%= owner ? 'inline' : 'none' %> ">
+				<button data-role="button" data-mini="true" class="edit" style="width:70px; display:  <%= owner ? 'inline' : 'none' %> ">
 					Edit
 				</button>
-				<button data-role="button" data-mini="true" class="delete" style="width:100px; display:  <%= owner ? 'inline' : 'none' %> ">
+				<button data-role="button" data-mini="true" class="delete" style="width:70px; display:  <%= owner ? 'inline' : 'none' %> ">
 					Delete
 				</button>
 			</div>
@@ -465,11 +487,11 @@
 	        
 	        <div class="container_12">
 	        	<div class="grid_6" style="margin-top: 10px">New Password:</div>
-	        	<div class="grid_6"><input id="pass-input" type="text" data-mini="true"></div>
+	        	<div class="grid_6"><input id="pass-input" type="password" data-mini="true"></div>
 	        </div>
 	        <div class="container_12">
 	        	<div class="grid_6" style="margin-top: 10px">Repeat Password:</div>
-	        	<div class="grid_6"><input id="pass-input" type="text" data-mini="true"></div>
+	        	<div class="grid_6"><input id="pass-input" type="password" data-mini="true"></div>
 	        </div>
 	        
 	        <!-- <div class="container_12">

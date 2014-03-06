@@ -55,7 +55,7 @@ $(function(){
 	
 	AddEventView = Parse.View.extend({
 		events: {
-			"click input.add-event": "saveEvent",
+			"click button.add-event": "saveEvent",
 			"change #event-recur": "toggleRecur"
 		},
 		
@@ -63,7 +63,7 @@ $(function(){
 		
 		initialize: function() {
 			var self = this;
-			_.bindAll(this, "saveEvent", "toggleRecur");
+			_.bindAll(this, "saveEvent", "toggleRecur", "continueInit");
 			
 			if(typeof self.options.editing == 'undefined') {
 				console.info("Editing was not defined. New event being added.");
@@ -77,9 +77,36 @@ $(function(){
 			console.info(self.options);
 			console.info(moment(this.model.get('start')).format("YYYY-MM-DD"));
 			console.info(moment(this.model.get('start')).format("HH:ss"));
+			console.info(moment(this.model.get('end')).format("YYYY-MM-DD"));
 			console.info(moment(this.model.get('end')).format("HH:ss"));
 			
-	        var template = _.template($("#add-event-template").html());
+			Parse.Cloud.run("isUserRegistered", {}, {
+				success: function(registered) {
+					if(registered) {
+						self.continueInit();
+					}
+					else {
+						$.mobile.changePage("#register-dialog");
+						goBack();
+					}
+				},
+				error: function(error) {
+					alert(error);
+				}
+			});
+			
+			self.saving = false;
+		},
+		
+		continueInit: function() {
+			var self = this;
+			var template = _.template($("#add-event-template").html());
+			
+			
+				// defaultStartDate:	moment(this.model.get('start')).format("YYYY-MM-DD"),
+				// defaultStartTime:	moment(this.model.get('start')).format("HH:ss"),
+				// defaultEndDate:		moment(this.model.get('end')).format("YYYY-MM-DD"),
+				// defaultEndTime:		moment(this.model.get('end')).format("HH:ss")
 	        
 	        this.$el.html(template({
 	        	name:   self.model.get('name'),
@@ -90,10 +117,9 @@ $(function(){
 				recur:  self.model.get('recur'),
 				repeat: self.model.get('repeat'),
 				each:	self.model.get('each') == 0,
-				defaultDate:		moment(this.model.get('start')).format("YYYY-MM-DD"),
-				defaultStartTime:	moment(this.model.get('start')).format("HH:ss"),
-				defaultEndTime:		moment(this.model.get('end')).format("HH:ss")
 	        }));
+	        
+	        
 	        
 	        console.info(new Date());
 	        
@@ -104,7 +130,8 @@ $(function(){
 	        this.weekly		= this.$("#recur-weekly");
 	        this.start		= this.$('#event-start');
 	        this.startTime	= this.$('#start-time');
-	        this.endTime	= this.$('#endTime');
+	        this.end		= this.$('#event-end');
+	        this.endTime	= this.$('#end-time');
 	        this.repeat		= {'Sun':false, 'Mon':false, 'Tue':false, 'Wed':false, 'Thu':false, 'Fri':false,'Sat':false};
 	        this.repeatMap 	= {0:'Sun', 1:'Mon', 2:'Tue', 3:'Wed', 4:'Thu', 5:'Fri', 6:'Sat'};
 	        
@@ -128,12 +155,21 @@ $(function(){
 		saveEvent: function(e) {
 			var self = this;
 			
+			if(self.saving) {
+				return;
+			}
+			
+			self.saving = true;
+			
 			$("input[name='group4']").each(
 				function(ndx, obj){
 					self.repeat[self.repeatMap[ndx]] = $(this).is(":checked");
 				});
 			
 			console.info("Saving Event");
+			
+			var buttonObj = self.$("button.add-event");
+			buttonObj.html(buttonObj.html().replace("Submit", "Submiting..."));
 				
 			self.model.save({
 				name: 	this.eventName.val(),
@@ -143,19 +179,23 @@ $(function(){
 				each:	(this.weekly.is(":checked") ? 0 : 1),
 				repeat: this.repeat,
 				start:	this.createDate(this.start.val(), this.startTime.val()),
+				end:	this.createDate(this.end.val(), this.endTime.val()),
 				user: Parse.User.current(),
 				username: Parse.User.current().get("username")
 			}).then(
 				function(obj){
 					//console.info("Save success, creating new Event model.");
-					console.info(self.model);
+					//console.info(self.model);
 					//self.model.clear();
-					console.info(self.model);
+					//console.info(self.model);
 					//self.model = new Event({username: Parse.User.current().get("username")});
 					console.info(self.model);
+					buttonObj.html(buttonObj.html().replace("Submiting...", "Event Created!"));
 				},
 				function(error) {
 					alert("Error saving event: " + error.message);
+					buttonObj.html(buttonObj.html().replace("Submiting...", "Submit"));
+					self.saving = false;
 				}
 			);
 		},
@@ -185,7 +225,7 @@ $(function(){
 		    
 		    console.log("Hours: " + hours);
 		    
-		    if(hours.charAt(0 == '0')) {
+		    if(hours.charAt(0) == '0') {
 		    	hours = hours.slice(1,2);
 		    }
 		    console.log("Hours: " + hours);
@@ -199,8 +239,40 @@ $(function(){
 		},
 	
 	    render: function() {
+	    	var self = this;
 	      	this.delegateEvents();
 	   	  	this.$el.trigger('create');
+	   	  	
+	   	  	// Populate date/time fields with data for editing
+	        if(typeof self.options.editing != 'undefined') {
+	        	console.info("Populating date fields.");
+	        	self.$('#event-start').trigger('datebox', {
+	        		'method':'set', 
+	        		'value': moment(self.model.get('start')).format("YYYY-MM-DD"), 
+	        		'date':  self.model.get('start')
+        		});
+        		
+        		console.info(moment(self.model.get('end')).format("YYYY-MM-DD"));
+	        		
+	        	self.$('#event-end').trigger('datebox', {
+	        		'method':'set', 
+	        		'value': moment(self.model.get('end')).format("YYYY-MM-DD"), 
+	        		'date':  self.model.get('end')
+        		});
+	        		
+	        	self.$('#start-time').trigger('datebox', {
+	        		'method':'set', 
+	        		'value': moment(self.model.get('start')).format("HH:ss"), 
+	        		'date':  self.model.get('start')
+        		});
+	        	
+	        	self.$('#end-time').trigger('datebox', {
+	        		'method':'set', 
+	        		'value': moment(self.model.get('end')).format("HH:ss"), 
+	        		'date':  self.model.get('end')
+        		});
+	        }
+	   	  	
 		  	return this;
 	    }
 	});

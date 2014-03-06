@@ -59,6 +59,14 @@ var appViewTitles = {
  */
 var appHistory = new Array();
 
+/**
+ * Cheesy Notifcation System 
+ */
+var eventStartTimes = new Array();
+var shownNotifications = {};
+
+
+
 function updateBackButton() {
 	if(appHistory.length <= 1) {
 		console.info("Disabling back button");
@@ -200,8 +208,8 @@ $(function(){
 	
 	
 	$("#menu-account-profile").click(function(){changeView("UserProfileView"); activateFooter("profile");return false;});
-	$("#menu-account-settings").click(function(){changeView("UserProfileView"); activateFooter("settings");return false;});
-	$("#menu-account-subs").click(function(){changeView("UserSubscriptionView"); activateFooter("subs");return false;});
+	//$("#menu-account-settings").click(function(){changeView("UserProfileView"); activateFooter("settings");return false;});
+	//$("#menu-account-subs").click(function(){changeView("UserSubscriptionView"); activateFooter("subs");return false;});
 	
 	// $("#menu-account-settings").click(function(){
 		// $("#profile-settings").attr("class", "ui-btn ui-link ui-btn-active"); 
@@ -212,6 +220,7 @@ $(function(){
 	
 	$("#page").on("swiperight", function(){$("#externalpanel").panel("open"); return false;});
 	$.event.special.swipe.verticalDistanceThreshold = 25;
+	
 	
 	
 	// $('#display-calendar').bind('datebox', function(event, passed) {
