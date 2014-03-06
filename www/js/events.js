@@ -190,7 +190,12 @@ $(function(){
 					//console.info(self.model);
 					//self.model = new Event({username: Parse.User.current().get("username")});
 					console.info(self.model);
-					buttonObj.html(buttonObj.html().replace("Submiting...", "Event Created!"));
+					if(typeof self.options.editing == 'undefined') {
+						buttonObj.html(buttonObj.html().replace("Submiting...", "Event Created!"));
+					}
+					else {
+						buttonObj.html(buttonObj.html().replace("Submiting...", "Edit Success!"));
+					}
 				},
 				function(error) {
 					alert("Error saving event: " + error.message);
@@ -298,12 +303,16 @@ $(function(){
 		subscribe: function() {
 			var self = this;
 			
+			if(self.subed) {
+				return;
+			}
+			
 			// Parse.Cloud.run("addUserSubscription", {userID: Parse.User.current().id, eventID: self.model.id}, {
 				// success: function() {},
 				// error:	 function(error) {console.log("Error adding subscription: " + error.code + error.message);}
 			// });
 			
-			self.$("button.subscribe").attr("disabled", "true");
+			//self.$("button.subscribe").attr("disabled", "true");
 			//self.$("button.desub").removeAttr("disabled");
 			
 			var buttonObj = self.$("button.subscribe");
@@ -317,6 +326,7 @@ $(function(){
 			});
 			sub.save().then(
 				function(){
+					self.subed = true;
 					buttonObj.html(buttonObj.html().replace("Subscribing...", "Subscribed!"));
 				},
 				function(error){
