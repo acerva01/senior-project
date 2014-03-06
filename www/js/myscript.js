@@ -234,7 +234,7 @@ $(function(){
 	      	  changeView("TwoWeekView");
 	          //self.undelegateEvents();
 	          //delete self;
-	          startTimeTracking();
+	          //startTimeTracking();
 	        },
 	
 	        error: function(user, error) {
@@ -260,7 +260,7 @@ $(function(){
 	      	  appHistory = new Array();
 	          //self.undelegateEvents();
 	          //delete self;
-	          startTimeTracking();
+	          //startTimeTracking();
 	        },
 	
 	        error: function(user, error) {
